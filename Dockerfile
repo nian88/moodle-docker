@@ -4,6 +4,9 @@ ARG MOODLE_URL="https://github.com/moodle/moodle/archive/refs/tags/v5.2.0.tar.gz
 
 ENV TZ=Asia/Jakarta
 ENV DEBIAN_FRONTEND=noninteractive
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tzdata \
@@ -11,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     tar \
     unzip \
+    git \
     graphviz \
     aspell \
     ghostscript \
@@ -53,6 +57,9 @@ RUN mkdir -p /var/www/html/moodle \
     && curl -fL --retry 5 --retry-delay 5 "${MOODLE_URL}" -o /tmp/moodle.tar.gz \
     && tar -xzf /tmp/moodle.tar.gz -C /var/www/html/moodle --strip-components=1 \
     && rm /tmp/moodle.tar.gz
+
+RUN cd /var/www/html/moodle \
+    && composer install --no-dev --classmap-authoritative --no-interaction --prefer-dist
 
 RUN mkdir -p /var/www/moodledata \
     && chown -R www-data:www-data /var/www/moodledata \
