@@ -1,8 +1,9 @@
-FROM php:8.3-apache
+FROM php:8.3-apache-bookworm
 
 ARG MOODLE_URL="https://download.moodle.org/download.php/stable502/moodle-latest-502.tgz"
 
 ENV TZ=Asia/Jakarta
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tzdata \
@@ -24,6 +25,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libzip-dev \
     libldap2-dev \
     libpq-dev \
+    libonig-dev \
+    libpspell-dev \
     && ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
@@ -42,6 +45,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         opcache \
         exif \
         mbstring \
+        pspell \
     && a2enmod rewrite headers expires \
     && rm -rf /var/lib/apt/lists/*
 
