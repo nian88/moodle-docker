@@ -1,7 +1,5 @@
 FROM php:8.3-apache-bookworm
 
-ARG MOODLE_URL="https://download.moodle.org/download.php/stable502/moodle-latest-502.tgz"
-
 ENV TZ=Asia/Jakarta
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -49,8 +47,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && a2enmod rewrite headers expires \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL "${MOODLE_URL}" -o /tmp/moodle.tgz \
-    && tar -xzf /tmp/moodle.tgz -C /var/www/html/ \
+COPY moodle-latest-502.tgz /tmp/moodle.tgz
+
+RUN tar -xzf /tmp/moodle.tgz -C /var/www/html/ \
     && rm /tmp/moodle.tgz
 
 RUN mkdir -p /var/www/moodledata \
