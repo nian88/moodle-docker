@@ -1,5 +1,7 @@
 FROM php:8.3-apache-bookworm
 
+ARG MOODLE_URL="https://github.com/moodle/moodle/archive/refs/tags/v5.2.0.tar.gz"
+
 ENV TZ=Asia/Jakarta
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -47,10 +49,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && a2enmod rewrite headers expires \
     && rm -rf /var/lib/apt/lists/*
 
-COPY moodle-latest-502.tgz /tmp/moodle.tgz
-
-RUN tar -xzf /tmp/moodle.tgz -C /var/www/html/ \
-    && rm /tmp/moodle.tgz
+RUN mkdir -p /var/www/html/moodle \
+    && curl -fL --retry 5 --retry-delay 5 "${MOODLE_URL}" -o /tmp/moodle.tar.gz \
+    && tar -xzf /tmp/moodle.tar.gz -C /var/www/html/moodle --strip-components=1 \
+    && rm /tmp/moodle.tar.gz
 
 RUN mkdir -p /var/www/moodledata \
     && chown -R www-data:www-data /var/www/moodledata \
